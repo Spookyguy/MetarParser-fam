@@ -3,6 +3,7 @@ package io.github.mivek.service;
 import io.github.mivek.enums.CloudQuantity;
 import io.github.mivek.model.*;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -161,6 +162,27 @@ class WeatherCategoryServiceTest {
         final MilitaryWeatherCategory result = WeatherCategoryService.getInstance().computeWeatherCategory(metar, MilitaryWeatherCategory.class);
 
         assertEquals(expected, result);
+    }
+
+    @DisplayName("should compute weather category with height of cloud layer null")
+    @Test
+    void computeWeatherCategoryWithHeightNull() {
+        final Visibility visibility = new Visibility();
+        visibility.setMainVisibility("10km");
+        final Cloud cloudLow = new Cloud();
+        cloudLow.setHeight(200);
+        cloudLow.setQuantity(CloudQuantity.FEW);
+        final Cloud cloudMid = new Cloud();
+        cloudMid.setQuantity(CloudQuantity.BKN);
+
+        final Metar metar = new Metar();
+        metar.setVisibility(visibility);
+        metar.addCloud(cloudLow);
+        metar.addCloud(cloudMid);
+
+        final FAAWeatherCategory result = WeatherCategoryService.getInstance().computeWeatherCategory(metar, FAAWeatherCategory.class);
+
+        assertEquals(FAAWeatherCategory.VFR, result);
     }
 
     public static Stream<Arguments> computeFAAWeatherCategory() {
